@@ -1,85 +1,126 @@
 // frontend/app.js
 
 const GATEWAY_URL = "http://127.0.0.1:5000/api";
-const USER_ID = 1; // Kita hardcode user ID 1 untuk demo ini
+
+// === State Aplikasi ===
+let selectedUserId = null;
+let selectedUserAddress = "";
+let cart = []; // Keranjang belanja
+let intervalId = null; // Untuk auto-refresh
 
 // === Ambil Elemen DOM ===
 const userNameSpan = document.getElementById("user-name");
 const userAddressSpan = document.getElementById("user-address");
-const restoList = document.getElementById("restaurant-list");
+const userList = document.getElementById("user-list");
+
+const restaurantPanel = document.getElementById("restaurant-selection");
+const orderPanel = document.getElementById("order-creation");
+const historyPanel = document.getElementById("history-section");
+
+const restaurantDropdown = document.getElementById("restaurant-dropdown");
+const menuContainer = document.getElementById("menu-container");
 const menuList = document.getElementById("menu-list");
-const selectedRestoName = document.getElementById("selected-resto-name");
-const cartItemDiv = document.getElementById("cart-item");
-const orderListBody = document.getElementById("order-list-body");
+
+const cartList = document.getElementById("cart-list");
+const cartTotalPriceSpan = document.getElementById("cart-total-price");
 const createOrderBtn = document.getElementById("createOrderBtn");
 
-// === State Aplikasi ===
-let stagedOrder = null; // Menyimpan item yang akan dipesan
+const orderListBody = document.getElementById("order-list-body");
 
-// === Fungsi Logika ===
-
-/**
- * FUNGSI UNTUK: user-service
- * Mengambil profil pengguna dan menampilkannya di header.
- */
-async function fetchUserProfile(userId) {
-    try {
-        const response = await fetch(`${GATEWAY_URL}/user-service/users/${userId}`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const user = await response.json();
-        
-        userNameSpan.textContent = user.name;
-        userAddressSpan.textContent = user.address;
-    } catch (error) {
-        userNameSpan.textContent = "Gagal memuat";
-        userAddressSpan.textContent = "Gagal memuat";
-        console.error("Fetch user profile error:", error);
-    }
-}
+// === FUNGSI UTAMA ===
 
 /**
- * FUNGSI UNTUK: restaurant-service (Bagian 1)
- * Mengambil dan menampilkan daftar restoran
+ * 1. Muat daftar user di awal
  */
-async function fetchRestaurants() {
-    restoList.innerHTML = "<li>Memuat...</li>";
+async function fetchAllUsers() {
+    userList.innerHTML = "<li>Memuat...</li>";
     try {
-        const response = await fetch(`${GATEWAY_URL}/restaurant-service/restaurants`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const restaurants = await response.json();
+        const response = await fetch(`${GATEWAY_URL}/user-service/users`);
+        const users = await response.json();
         
-        restoList.innerHTML = ""; // Kosongkan list
-        restaurants.forEach(resto => {
+        userList.innerHTML = "";
+        users.forEach(user => {
             const li = document.createElement("li");
-            li.textContent = `${resto.name} (ID: ${resto.id})`;
-            li.addEventListener("click", () => fetchMenu(resto.id, resto.name));
-            restoList.appendChild(li);
+            li.textContent = `${user.name} (ID: ${user.id})`;
+            li.dataset.userId = user.id;
+            li.dataset.userName = user.name;
+            li.dataset.userAddress = user.address;
+            
+            li.addEventListener("click", () => selectUser(user, li));
+            userList.appendChild(li);
         });
     } catch (error) {
-        restoList.innerHTML = `<li>Gagal memuat: ${error.message}</li>`;
+        userList.innerHTML = `<li>Gagal memuat user: ${error.message}</li>`;
     }
 }
 
 /**
- * FUNGSI UNTUK: restaurant-service (Bagian 2)
- * Mengambil dan menampilkan menu dari 1 restoran
+ * 2. Dipanggil saat user diklik (simulasi "Login")
  */
-async function fetchMenu(restoId, restoName) {
+function selectUser(user, clickedLi) {
+    selectedUserId = user.id;
+    selectedUserAddress = user.address;
+
+    userNameSpan.textContent = user.name;
+    userAddressSpan.textContent = user.address;
+    
+    restaurantPanel.classList.remove("hidden");
+    orderPanel.classList.remove("hidden");
+    historyPanel.classList.remove("hidden");
+    
+    cart = [];
+    updateCart();
+    restaurantDropdown.value = "";
+    menuContainer.classList.add("hidden");
+
+    document.querySelectorAll("#user-list li").forEach(li => li.classList.remove("selected"));
+    clickedLi.classList.add("selected");
+
+    fetchRestaurants();
+    fetchOrders(selectedUserId); 
+    
+    if (intervalId) clearInterval(intervalId);
+    intervalId = setInterval(() => fetchOrders(selectedUserId), 5000);
+}
+
+/**
+ * 3. Muat daftar restoran ke dropdown
+ */
+async function fetchRestaurants() {
+    try {
+        const response = await fetch(`${GATEWAY_URL}/restaurant-service/restaurants`);
+        const restaurants = await response.json();
+        
+        restaurantDropdown.innerHTML = '<option value="">--Pilih Resto--</option>';
+        restaurants.forEach(resto => {
+            const option = document.createElement("option");
+            option.value = resto.id;
+            option.textContent = resto.name;
+            restaurantDropdown.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Gagal memuat restoran:", error);
+    }
+}
+
+/**
+ * 4. Muat menu saat restoran dipilih
+ */
+async function fetchMenu(restoId) {
     menuList.innerHTML = "<li>Memuat menu...</li>";
-    selectedRestoName.textContent = `Menu untuk: ${restoName}`;
-    stagedOrder = null;
-    updateCreateOrderButton();
+    menuContainer.classList.remove("hidden");
 
     try {
         const response = await fetch(`${GATEWAY_URL}/restaurant-service/restaurants/${restoId}/menu`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const menuItems = await response.json();
         
         menuList.innerHTML = ""; 
         menuItems.forEach(item => {
             const li = document.createElement("li");
-            li.textContent = `${item.name} - Rp${item.price}`;
-            li.addEventListener("click", () => stageItemForOrder(item));
+            li.innerHTML = `
+                <span>${item.name} - Rp${item.price}</span>
+                <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})">Tambah</button>
+            `;
             menuList.appendChild(li);
         });
     } catch (error) {
@@ -87,109 +128,110 @@ async function fetchMenu(restoId, restoName) {
     }
 }
 
-/**
- * FUNGSI UNTUK: order-service (Helper)
- * Menyiapkan item untuk dipesan
- */
-function stageItemForOrder(menuItem) {
-    stagedOrder = {
-        menu_id: menuItem.id,
-        name: menuItem.name,
-        price: menuItem.price,
-        quantity: 1 
-    };
-    cartItemDiv.innerHTML = `<p><strong>${stagedOrder.name}</strong> (Qty: 1)</p>`;
-    updateCreateOrderButton();
-}
-
-/**
- * FUNGSI UNTUK: order-service (Helper)
- * Mengaktifkan/Menonaktifkan tombol pesan
- */
-function updateCreateOrderButton() {
-    createOrderBtn.disabled = !stagedOrder;
-    if (!stagedOrder) {
-        cartItemDiv.innerHTML = "<p>Pilih menu untuk memesan.</p>";
+restaurantDropdown.addEventListener("change", () => {
+    const restoId = restaurantDropdown.value;
+    if (restoId) {
+        fetchMenu(restoId);
+    } else {
+        menuContainer.classList.add("hidden");
     }
-}
+});
 
 /**
- * FUNGSI UNTUK: order-service & driver-service (Visual)
- * Mengambil dan menampilkan riwayat pesanan (user 1)
+ * 5. Logika Keranjang (Add to Cart)
  */
-/**
- * FUNGSI UNTUK: order-service & driver-service (Visual)
- * Mengambil dan menampilkan riwayat pesanan (user 1)
- */
-async function fetchOrders(userId) {
-    try {
-        const response = await fetch(`${GATEWAY_URL}/order-service/orders/user/${userId}`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const orders = await response.json();
-
-        orderListBody.innerHTML = ""; // Kosongkan tabel
-        if (orders.message) { 
-            orderListBody.innerHTML = `<tr><td colspan="5">${orders.message}</td></tr>`; // BARU: colspan="5"
-            return;
-        }
-
-        orders.sort((a, b) => b.order_id - a.order_id); 
-
-        orders.forEach(order => {
-            const tr = document.createElement("tr");
-
-            // BARU: Logika untuk status
-            let statusClass = '';
-            if (order.status === 'PENDING') statusClass = 'status-pending';
-            if (order.status === 'CONFIRMED') statusClass = 'status-confirmed';
-            if (order.status === 'DELIVERED') statusClass = 'status-delivered';
-
-            let driverId = order.driver_id ? order.driver_id : '-';
-
-            // BARU: Logika untuk tombol Aksi
-            let actionCell = '<td>-</td>'; // Default tidak ada aksi
-
-            if (order.status === 'CONFIRMED') {
-                // Jika status CONFIRMED, tambahkan tombol "Selesai"
-                actionCell = `
-                    <td>
-                        <button class="complete-btn" onclick="completeOrder(${order.order_id})">
-                            Selesai
-                        </button>
-                    </td>
-                `;
-            }
-
-            tr.innerHTML = `
-                <td>${order.order_id}</td>
-                <td>Rp${order.total_price}</td>
-                <td class="${statusClass}">${order.status}</td>
-                <td>${driverId}</td>
-                ${actionCell} `;
-            orderListBody.appendChild(tr);
+function addToCart(menuId, name, price) {
+    const existingItem = cart.find(item => item.menu_id === menuId);
+    
+    if (existingItem) {
+        existingItem.quantity++;
+    } else {
+        cart.push({
+            menu_id: menuId,
+            name: name,
+            price: price,
+            quantity: 1
         });
-    } catch (error) {
-        orderListBody.innerHTML = `<tr><td colspan="5">Gagal memuat riwayat.</td></tr>`; // BARU: colspan="5"
-        console.error("Fetch orders error:", error);
     }
+    updateCart(); // Panggil updateCart untuk me-render ulang
 }
 
 /**
- * FUNGSI UNTUK: order-service (Aksi)
- * Membuat pesanan baru
+ * BARU: Fungsi untuk mengubah jumlah item di keranjang
  */
-async function createOrder() {
-    if (!stagedOrder) {
-        alert("Silakan pilih menu terlebih dahulu!");
+function updateCartItemQuantity(menuId, newQuantity) {
+    const quantity = parseInt(newQuantity);
+    
+    if (quantity < 1) {
+        // Jika jumlah 0 atau kurang, hapus item
+        removeFromCart(menuId);
         return;
     }
-    createOrderBtn.disabled = true; // Nonaktifkan tombol saat proses
+    
+    const item = cart.find(item => item.menu_id === menuId);
+    if (item) {
+        item.quantity = quantity;
+    }
+    updateCart(); // Render ulang keranjang & total
+}
+
+/**
+ * BARU: Fungsi untuk menghapus item dari keranjang
+ */
+function removeFromCart(menuId) {
+    cart = cart.filter(item => item.menu_id !== menuId);
+    updateCart(); // Render ulang keranjang & total
+}
+
+/**
+ * FUNGSI DIPERBARUI: Render ulang tampilan keranjang
+ */
+function updateCart() {
+    cartList.innerHTML = ""; // Kosongkan
+    let totalPrice = 0;
+    
+    if (cart.length === 0) {
+        cartList.innerHTML = "<li>Keranjang kosong</li>";
+        createOrderBtn.disabled = true;
+    } else {
+        cart.forEach(item => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+                <span class="cart-item-name">${item.name} (Rp${item.price})</span>
+                <div class="cart-item-controls">
+                    <input type="number" min="1" value="${item.quantity}" 
+                           onchange="updateCartItemQuantity(${item.menu_id}, this.value)">
+                    <button class="remove-btn" onclick="removeFromCart(${item.menu_id})">Hapus</button>
+                </div>
+            `;
+            cartList.appendChild(li);
+            totalPrice += item.price * item.quantity;
+        });
+        createOrderBtn.disabled = false;
+    }
+    cartTotalPriceSpan.textContent = totalPrice;
+}
+
+/**
+ * 6. Kirim Pesanan ke Backend
+ */
+async function createOrder() {
+    if (!selectedUserId || cart.length === 0) {
+        alert("User belum dipilih atau keranjang kosong!");
+        return;
+    }
+
+    createOrderBtn.disabled = true;
+    createOrderBtn.textContent = "Memproses...";
+
+    const itemsPayload = cart.map(item => ({
+        "menu_id": item.menu_id,
+        "quantity": item.quantity
+    }));
 
     const orderPayload = {
-        "user_id": USER_ID,
-        "items": [
-            { "menu_id": stagedOrder.menu_id, "quantity": stagedOrder.quantity }
-        ]
+        "user_id": selectedUserId,
+        "items": itemsPayload
     };
 
     try {
@@ -205,64 +247,86 @@ async function createOrder() {
             alert(`Gagal membuat pesanan: ${result.error || 'Unknown error'}`);
         } else {
             alert(`Pesanan berhasil dibuat! Order ID: ${result.order.order_id}`);
-            
-            // Muat ulang riwayat agar order 'PENDING' langsung muncul
-            fetchOrders(USER_ID); 
-            
-            // Kosongkan keranjang
-            stagedOrder = null;
-            updateCreateOrderButton();
+            fetchOrders(selectedUserId); 
+            cart = [];
+            updateCart();
         }
     } catch (error) {
         alert(`Gagal membuat pesanan: ${error.message}`);
     }
     
-    // Aktifkan lagi tombolnya (walau keranjang sudah kosong)
-    createOrderBtn.disabled = !stagedOrder; 
+    createOrderBtn.disabled = (cart.length === 0);
+    createOrderBtn.textContent = "Kirim Pesanan";
 }
+
+createOrderBtn.addEventListener("click", createOrder);
+
 /**
- * BARU: Fungsi untuk menyelesaikan pesanan (memanggil backend)
+ * 7. Muat Riwayat Pesanan
+ */
+async function fetchOrders(userId) {
+    if (!userId) return; 
+
+    try {
+        const response = await fetch(`${GATEWAY_URL}/order-service/orders/user/${userId}`);
+        const orders = await response.json();
+        
+        orderListBody.innerHTML = ""; 
+        if (orders.message) { 
+            orderListBody.innerHTML = `<tr><td colspan="5">${orders.message}</td></tr>`;
+            return;
+        }
+        
+        orders.sort((a, b) => b.order_id - a.order_id); 
+        
+        orders.forEach(order => {
+            const tr = document.createElement("tr");
+            let statusClass = '';
+            if (order.status === 'PENDING') statusClass = 'status-pending';
+            if (order.status === 'CONFIRMED') statusClass = 'status-confirmed';
+            if (order.status === 'DELIVERED') statusClass = 'status-delivered';
+            
+            let driverId = order.driver_id ? order.driver_id : '-';
+            
+            if (order.status === 'CONFIRMED') {
+                actionCell = `<td><button class="complete-btn" onclick="completeOrder(${order.order_id})">Selesai</button></td>`;
+            }
+
+            tr.innerHTML = `
+                <td>${order.order_id}</td>
+                <td>Rp${order.total_price}</td>
+                <td class="${statusClass}">${order.status}</td>
+                <td>${driverId}</td>
+            `;
+            orderListBody.appendChild(tr);
+        });
+    } catch (error) {
+        orderListBody.innerHTML = `<tr><td colspan="5">Gagal memuat riwayat.</td></tr>`;
+    }
+}
+
+/**
+ * 8. Selesaikan Pesanan
  */
 async function completeOrder(orderId) {
-    // Konfirmasi sederhana
-    if (!confirm(`Apakah Anda yakin ingin menyelesaikan Pesanan ID: ${orderId}?`)) {
-        return;
-    }
-
+    if (!confirm(`Apakah Anda yakin ingin menyelesaikan Pesanan ID: ${orderId}?`)) return;
     try {
         const response = await fetch(`${GATEWAY_URL}/order-service/orders/${orderId}/complete`, {
             method: 'PUT',
         });
-
         const result = await response.json();
-
         if (!response.ok) {
             alert(`Gagal menyelesaikan pesanan: ${result.error || 'Unknown error'}`);
         } else {
             alert(`Pesanan ${orderId} telah selesai! Driver akan dibebaskan.`);
-
-            // Refresh list pesanan untuk melihat perubahannya
-            fetchOrders(USER_ID); 
+            fetchOrders(selectedUserId); 
         }
     } catch (error) {
         alert(`Gagal menghubungi server: ${error.message}`);
     }
 }
 
-// === Event Listeners ===
-// Muat data awal saat halaman dibuka
+// === Muat data awal saat halaman dibuka ===
 document.addEventListener("DOMContentLoaded", () => {
-    fetchUserProfile(USER_ID);      // Panggil user-service
-    fetchRestaurants();             // Panggil restaurant-service
-    fetchOrders(USER_ID);           // Panggil order-service
-    updateCreateOrderButton();
-
-    // INI ADALAH BUKTI VISUAL DARI 'driver-service'
-    // Kita cek status pesanan setiap 5 detik.
-    // Anda akan melihat status 'PENDING' berubah menjadi 'CONFIRMED'
-    // setelah driver-service di background selesai bekerja.
-    setInterval(() => fetchOrders(USER_ID), 5000); 
+    fetchAllUsers(); // Mulai dengan memuat daftar user
 });
-
-// Tambahkan event ke tombol
-createOrderBtn.addEventListener("click", createOrder);

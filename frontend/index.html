@@ -3,60 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food Delivery Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <title>Food Delivery App</title>
+    <link rel="stylesheet" href="style.css"> </head>
 <body>
 
     <header>
         <h1>Food Delivery Dashboard</h1>
         <div class="profile-box">
-            <strong>Profil Pengguna (User ID: 1)</strong>
-            <p>Nama: <span id="user-name">Memuat...</span></p>
-            <p>Alamat: <span id="user-address">Memuat...</span></p>
+            <strong>Profil Pengguna</strong>
+            <p>Nama: <span id="user-name">-Pilih User-</span></p>
+            <p>Alamat: <span id="user-address">-</span></p>
         </div>
+        <a href="admin.html" class="admin-link">Pergi ke Halaman Admin</a>
     </header>
 
-    <main>
-        <section id="restaurants">
-            <h2>1. Pilih Restoran</h2>
-            <ul id="restaurant-list">
+    <main class="user-main">
+
+        <section id="user-selection" class="panel">
+            <h2>1. Pilih Pengguna (dari User Service)</h2>
+            <p>Silakan pilih user untuk "Login":</p>
+            <ul id="user-list">
                 </ul>
         </section>
 
-        <section id="menu">
-            <h2>2. Pilih Menu</h2>
-            <h3 id="selected-resto-name">Silakan pilih restoran...</h3>
-            <ul id="menu-list">
-                </ul>
-        </section>
-
-        <section id="order-section">
-            <h2>3. Keranjang Pesanan</h2>
-            <div id="cart-item">
-                <p>Belum ada item dipilih.</p>
-            </div>
-            <button id="createOrderBtn" disabled>Buat Pesanan (sebagai User 1)</button>
+        <section id="restaurant-selection" class="panel hidden">
+            <h2>2. Pilih Restoran & Menu (dari Restaurant Service)</h2>
             
-            <hr>
+            <label for="restaurant-dropdown">Pilih Restoran:</label>
+            <select id="restaurant-dropdown">
+                <option value="">--Pilih Resto--</option>
+            </select>
 
-            <h2>Riwayat Pesanan (Auto-Refresh 5 dtk)</h2>
-            <div id="order-history-container">
-                <table id="order-table">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                            <th>Driver ID</th>
-                            <th>Aksi</th> </tr>
-                    </thead>
-                    <tbody id="order-list-body">
-                        </tbody>
-                </table>
+            <div id="menu-container" class="hidden">
+                <hr>
+                <h3>Menu yang Tersedia:</h3>
+                <ul id="menu-list">
+                    </ul>
             </div>
         </section>
+
+        <section id="order-creation" class="panel hidden">
+            <h2>3. Keranjang & Pesan (ke Order Service)</h2>
+            
+            <div id="cart">
+                <h4>Keranjang Anda:</h4>
+                <ul id="cart-list">
+                    </ul>
+                <div id="cart-total">
+                    <strong>Total: Rp<span id="cart-total-price">0</span></strong>
+                </div>
+            </div>
+            
+            <button id="createOrderBtn" disabled>Kirim Pesanan</button>
+        </section>
+
     </main>
+
+    <section id="history-section" class="panel hidden">
+        <h2>Riwayat Pesanan (dari Order & Driver Service)</h2>
+        <p>Auto-refresh setiap 5 detik. Status akan berubah dari `PENDING` -> `CONFIRMED`.</p>
+        <div id="order-history-container">
+            <table id="order-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Driver ID</th>
+                    </tr>
+                </thead>
+                <tbody id="order-list-body">
+                    </tbody>
+            </table>
+        </div>
+    </section>
 
     <script src="app.js"></script>
 </body>

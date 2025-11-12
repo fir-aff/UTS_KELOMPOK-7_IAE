@@ -16,15 +16,14 @@ db = SQLAlchemy(app)
 # Definisikan URL layanan lain.
 USER_SERVICE_URL = "http://127.0.0.1:5001"
 RESTAURANT_SERVICE_URL = "http://127.0.0.1:5002"
-DRIVER_SERVICE_URL = "http://127.0.0.1:5004"  # BARU: Menambahkan URL driver-service
+DRIVER_SERVICE_URL = "http://127.0.0.1:5004"
 
-# 2. Buat Model Database (Tidak ada perubahan di sini)
+# 2. Buat Model Database
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
     total_price = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(50), nullable=False, default='PENDING')
-    # BARU: Tambahkan kolom untuk driver_id
     driver_id = db.Column(db.Integer, nullable=True) 
     items = db.relationship('OrderItem', backref='order', lazy=True)
 
@@ -62,7 +61,7 @@ def create_order():
     # === LANGKAH 2: Validasi Menu & Hitung Total Harga (Memanggil restaurant-service) ===
     total_price = 0
     order_items_to_create = []
-    restaurant_address = "" # BARU: Kita butuh alamat resto untuk driver
+    restaurant_address = "Jalan Padang No. 10" # Asumsi/Hardcode
 
     try:
         for item in items_data:
@@ -80,12 +79,6 @@ def create_order():
                 quantity=quantity,
                 price_per_item=item_price
             ))
-            
-            # BARU: Ambil alamat restoran (Kita asumsikan 1 pesanan hanya dari 1 resto)
-            # (Ini perlu request tambahan, tapi kita bisa akali dengan endpoint /menu/id)
-            # Untuk simplifikasi, kita hardcode dulu. Di dunia nyata, /menu/id akan mengembalikan data resto.
-            restaurant_address = "Jalan Padang No. 10" # Alamat dari Step 2
-
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error calling restaurant-service: {e}")
         return jsonify({'error': f"Could not connect to restaurant-service: {e}"}), 503
@@ -95,7 +88,7 @@ def create_order():
         new_order = Order(
             user_id=user_id,
             total_price=total_price,
-            status='PENDING' # Status awal
+            status='PENDING'
         )
         for item in order_items_to_create:
             new_order.items.append(item)
@@ -106,12 +99,12 @@ def create_order():
         app.logger.error(f"Error saving to database: {e}")
         return jsonify({'error': 'Failed to save order to database'}), 500
 
-    # === LANGKAH 4: BARU - Minta Driver (Memanggil driver-service) ===
+    # === LANGKAH 4: Minta Driver (Memanggil driver-service) ===
     try:
         driver_request_payload = {
             "order_id": new_order.id,
             "restaurant_address": restaurant_address,
-            "user_address": user_data.get('address') # Alamat user dari user-service
+            "user_address": user_data.get('address')
         }
         
         driver_response = requests.post(
@@ -119,22 +112,17 @@ def create_order():
             json=driver_request_payload
         )
         
-        # Jika tidak ada driver, status order tetap 'PENDING'
         if driver_response.status_code == 404:
             app.logger.warn(f"No available drivers for order {new_order.id}")
-            # Tidak return error, pesanan tetap dibuat tapi menunggu driver
         else:
-            driver_response.raise_for_status() # Error jika bukan 404 atau 2xx
+            driver_response.raise_for_status()
             driver_data = driver_response.json()
             app.logger.info(f"Driver {driver_data.get('driver_name')} assigned for order {new_order.id}")
 
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error calling driver-service: {e}")
-        # Pesanan sudah dibuat, tapi gagal panggil driver.
-        # Kita bisa biarkan statusnya 'PENDING' dan coba lagi nanti (antrian)
-        # Untuk saat ini, kita biarkan saja.
 
-    # === LANGKAH 5: Kirim Response (Format respons akhir) ===
+    # === LANGKAH 5: Kirim Response ===
     created_order_json = {
         'order_id': new_order.id,
         'user_id': new_order.user_id,
@@ -147,6 +135,27 @@ def create_order():
         ]
     }
     return jsonify({'message': 'Order created and driver search initiated', 'order': created_order_json}), 201
+
+# BARU: Endpoint untuk mendapatkan SEMUA pesanan (untuk Admin)
+@app.route('/orders', methods=['GET'])
+def get_all_orders():
+    try:
+        orders = Order.query.all()
+        result = []
+        for order in orders:
+            result.append({
+                'order_id': order.id,
+                'user_id': order.user_id,
+                'status': order.status,
+                'total_price': order.total_price,
+                'driver_id': order.driver_id
+            })
+        # Urutkan dari yang terbaru
+        result.sort(key=lambda x: x['order_id'], reverse=True)
+        return jsonify(result), 200
+    except Exception as e:
+        app.logger.error(f"Error getting all orders: {e}")
+        return jsonify({'error': str(e)}), 500
 
 # --- Endpoint 'Provider' untuk riwayat pesanan ---
 @app.route('/orders/user/<int:user_id>', methods=['GET'])
@@ -164,7 +173,7 @@ def get_orders_by_user(user_id):
         })
     return jsonify(result), 200
 
-# --- BARU: Endpoint 'Provider' yang dipanggil oleh driver-service ---
+# --- Endpoint 'Provider' yang dipanggil oleh driver-service ---
 @app.route('/orders/<int:order_id>/status', methods=['PUT'])
 def update_order_status(order_id):
     order = Order.query.get(order_id)
@@ -185,15 +194,43 @@ def update_order_status(order_id):
     db.session.commit()
     
     app.logger.info(f"Order {order_id} status updated to {new_status} by driver {driver_id}")
-    
     return jsonify({'message': 'Order status updated', 'order_id': order.id, 'new_status': order.status}), 200
 
+# --- Endpoint untuk menyelesaikan pesanan (dipanggil oleh Frontend) ---
+@app.route('/orders/<int:order_id>/complete', methods=['PUT'])
+def complete_order(order_id):
+    order = Order.query.get(order_id)
+    if not order:
+        return jsonify({'error': 'Order not found'}), 404
+
+    # 1. Ubah status order di database ini
+    order.status = 'DELIVERED'
+    db.session.commit()
+    app.logger.info(f"Order {order.id} status updated to DELIVERED")
+
+    # 2. Periksa apakah ada driver yang ditugaskan
+    if order.driver_id:
+        driver_id = order.driver_id
+        app.logger.info(f"Order {order.id} was handled by driver {driver_id}. Releasing driver...")
+
+        # 3. Panggil driver-service untuk membebaskan driver (Peran Consumer)
+        try:
+            callback_url = f"{DRIVER_SERVICE_URL}/drivers/{driver_id}/status"
+            callback_payload = {"status": "available"}
+
+            response = requests.put(callback_url, json=callback_payload)
+            response.raise_for_status() # Error jika status code bukan 2xx
+
+            app.logger.info(f"Successfully called driver-service to release driver {driver_id}")
+
+        except requests.exceptions.RequestException as e:
+            app.logger.error(f"Failed to call driver-service to release driver {driver_id}: {e}")
+
+    return jsonify({'message': 'Order completed and driver released'}), 200
 
 # 4. Jalankan Aplikasi
 if __name__ == '__main__':
     with app.app_context():
-        # db.drop_all() # Hati-hati, ini akan menghapus data lama
-        db.create_all() # Jalankan ini untuk menambah kolom 'driver_id'
-        
-    # Jalankan di port 5003
+        db.create_all() 
+    
     app.run(host='0.0.0.0', port=5003, debug=True)

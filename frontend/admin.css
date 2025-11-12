@@ -1,0 +1,177 @@
+/* frontend/admin.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5;
+}
+header {
+    background-color: #d9534f;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+header h1 { margin: 0; }
+header a {
+    color: white;
+    font-size: 0.9em;
+    background: #c9302c;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+/* Layout Grid 2x2 */
+.top-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 1rem;
+    gap: 1.5rem;
+}
+.panel {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+.top-grid .panel {
+    width: 45%; /* Dua panel per baris */
+    min-width: 400px;
+}
+
+/* Layout Panel Full-Width (untuk Menu) */
+.full-width {
+    width: 92%; /* Lebar penuh - sedikit margin */
+    margin: 0 auto 1.5rem auto;
+}
+.hidden {
+    display: none;
+}
+
+/* Header Panel (Judul) */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #d9534f;
+    padding-bottom: 10px;
+}
+.panel h2 {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+.add-new-btn {
+    background-color: #5bc0de;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin: 0;
+}
+.add-new-btn:hover {
+    background-color: #31b0d5;
+}
+
+/* Tombol refresh */
+button {
+    background-color: #0275d8;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    align-self: flex-start;
+}
+button:hover {
+    background-color: #025aa5;
+}
+
+/* Style Tabel */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    word-break: break-all;
+}
+table th:last-child, table td:last-child {
+    width: 120px;
+    text-align: center;
+}
+.action-btn {
+    background-color: #f0ad4e; /* Oranye */
+    color: white;
+    padding: 5px 8px;
+    font-size: 0.85em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 2px;
+}
+.action-btn.red { background-color: #d9534f; }
+.action-btn.green { background-color: #5cb85c; }
+.action-btn.blue { background-color: #0275d8; }
+.action-btn:disabled { background-color: #aaa; }
+
+/* Pewarnaan Status */
+.status-available { color: #27ae60; font-weight: bold; }
+.status-on_trip { color: #e67e22; font-weight: bold; }
+.status-pending { color: #e67e22; font-weight: bold; }
+.status-confirmed { color: #27ae60; font-weight: bold; }
+.status-delivered { color: #6c757d; font-weight: bold; }
+
+/* Style Panel Menu */
+.form-inline {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+}
+.form-inline .form-group {
+    flex-grow: 1;
+}
+.form-inline button {
+    margin-bottom: 1rem;
+    width: auto;
+    flex-shrink: 0;
+}
+.form-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.form-group input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+.submit-btn.green {
+    background-color: #5cb85c;
+    margin-top: 0;
+}
+.submit-btn.gray {
+    background-color: #aaa;
+    margin-top: 0;
+}
+.table-container {
+    overflow-y: auto;
+    max-height: 300px;
+    margin-top: 1rem;
+}

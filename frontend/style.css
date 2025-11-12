@@ -13,29 +13,35 @@ header {
     justify-content: space-between;
     align-items: center;
 }
-header h1 {
-    margin: 0;
-}
+header h1 { margin: 0; }
 .profile-box {
     background: #444;
     border-radius: 8px;
     padding: 0.5rem 1rem;
     font-size: 0.9em;
+    min-width: 200px;
 }
-.profile-box p {
-    margin: 5px 0;
-}
+.profile-box p { margin: 5px 0; }
 #user-name, #user-address {
     font-weight: bold;
-    color: #ffd700; /* Warna kuning untuk menyorot */
+    color: #ffd700;
 }
-main {
+.admin-link {
+    color: white;
+    font-size: 0.9em;
+    background: #d9534f;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+/* Layout Kolom Utama */
+.user-main {
     display: flex;
     justify-content: space-around;
     padding: 1rem;
     gap: 1rem;
 }
-section {
+.panel {
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -44,14 +50,98 @@ section {
     display: flex;
     flex-direction: column;
 }
-h2 {
-    border-bottom: 2px solid #333;
+.panel h2 {
+    border-bottom: 2px solid #007bff;
     padding-bottom: 10px;
     margin-top: 0;
 }
-h3 {
-    font-style: italic;
-    color: #555;
+.hidden {
+    display: none !important;
+}
+/* Kolom 1: User List */
+#user-list li {
+    background: #eee;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-weight: bold;
+}
+#user-list li:hover { background: #ddd; }
+#user-list li.selected {
+    background: #007bff;
+    color: white;
+}
+/* Kolom 2: Resto & Menu */
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+select, input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box; /* Pastikan padding tidak merusak layout */
+}
+#menu-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+#menu-list button {
+    font-size: 0.8em;
+    padding: 5px 8px;
+    margin: 0;
+    max-width: min-content;
+}
+
+/* --- STYLE BARU UNTUK KERANJANG --- */
+#cart-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+.cart-item-name {
+    font-weight: bold;
+}
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.cart-item-controls input[type="number"] {
+    width: 50px; /* Perkecil kotak input */
+    padding: 5px;
+    margin: 0;
+    text-align: center;
+}
+.cart-item-controls .remove-btn {
+    background: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-size: 0.8em;
+    cursor: pointer;
+    margin: 0;
+    width: auto; /* Jangan 100% */
+}
+/* ---------------------------------- */
+
+#cart-total {
+    text-align: right;
+    font-size: 1.2em;
+    margin-top: 15px;
+    border-top: 2px solid #333;
+    padding-top: 10px;
 }
 button {
     background-color: #007bff;
@@ -62,83 +152,44 @@ button {
     cursor: pointer;
     margin-bottom: 10px;
     transition: background 0.2s;
+    width: 100%;
 }
-button:hover {
-    background-color: #0056b3;
-}
+button:hover { background-color: #0056b3; }
 button:disabled {
     background-color: #aaa;
     cursor: not-allowed;
 }
-ul {
-    list-style: none;
-    padding: 0;
-    overflow-y: auto; /* Tambahkan scroll jika list panjang */
+/* Bagian Riwayat (di luar .main) */
+#history-section {
+    width: 95%;
+    margin: 1rem auto;
 }
-#restaurant-list li, #menu-list li {
-    background: #eee;
-    padding: 10px;
-    margin-bottom: 5px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-#restaurant-list li:hover, #menu-list li:hover {
-    background: #ddd;
-}
-#cart-item {
-    border: 1px dashed #ccc;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    background: #f9f9f9;
-}
-hr {
-    margin: 2rem 0;
-}
-/* Style untuk tabel riwayat */
 #order-history-container {
-    flex-grow: 1; /* Agar tabel mengisi sisa ruang */
     overflow-y: auto;
+    max-height: 400px;
 }
-#order-table {
+table {
     width: 100%;
     border-collapse: collapse;
 }
-#order-table th, #order-table td {
+table th, table td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
 }
-#order-table th {
-    background-color: #f2f2f2;
-}
-/* Sorot status untuk visual */
-.status-pending {
-    color: #e67e22;
-    font-weight: bold;
-}
-.status-confirmed {
-    color: #27ae60;
-    font-weight: bold;
-}
-/* BARU: Style untuk tombol "Selesai" di dalam tabel */
+table th { background-color: #f2f2f2; }
 .complete-btn {
-    background-color: #28a745; /* Warna hijau */
+    background-color: #28a745;
     color: white;
     padding: 5px 10px;
     font-size: 0.9em;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    width: auto;
+    margin: 0;
 }
-
-.complete-btn:hover {
-    background-color: #218838;
-}
-
-/* Style untuk status DELIVERED */
-.status-delivered {
-    color: #6c757d; /* Warna abu-abu */
-    font-weight: bold;
-}
+.complete-btn:hover { background-color: #218838; }
+.status-pending { color: #e67e22; font-weight: bold; }
+.status-confirmed { color: #27ae60; font-weight: bold; }
+.status-delivered { color: #6c757d; font-weight: bold; }

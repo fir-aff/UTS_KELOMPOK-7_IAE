@@ -59,6 +59,15 @@ def register_user():
     
     return jsonify({'message': 'User created successfully', 'user': new_user.to_dict()}), 201
 
+# BARU: Endpoint untuk mendapatkan SEMUA user (untuk dropdown)
+@app.route('/users', methods=['GET'])
+def get_all_users():
+    try:
+        users = User.query.all()
+        return jsonify([user.to_dict() for user in users]), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # Endpoint untuk mendapatkan data user (PENTING untuk 'order-service')
 # Ini adalah endpoint yang akan dikonsumsi oleh layanan lain.
 @app.route('/users/<int:id>', methods=['GET'])
@@ -82,6 +91,47 @@ def login_user():
         return jsonify({'message': 'Login successful', 'user_id': user.id}), 200
     
     return jsonify({'error': 'Invalid credentials'}), 401
+
+# BARU: Endpoint untuk UPDATE user (untuk Admin)
+@app.route('/users/<int:id>', methods=['PUT'])
+def update_user(id):
+    user = User.query.get(id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    data = request.get_json()
+
+    # Cek jika email baru sudah dipakai user lain
+    if 'email' in data and data['email'] != user.email:
+        if User.query.filter_by(email=data['email']).first():
+            return jsonify({'error': 'Email already exists'}), 400
+
+    # Update data
+    user.name = data.get('name', user.name)
+    user.email = data.get('email', user.email)
+    user.address = data.get('address', user.address)
+
+    # (Opsional: Update password jika ada)
+    if 'password' in data and data['password']: # Cek jika password tidak kosong
+         user.password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+
+    db.session.commit()
+    return jsonify({'message': 'User updated', 'user': user.to_dict()}), 200
+
+# BARU: Endpoint untuk DELETE user (untuk Admin)
+@app.route('/users/<int:id>', methods=['DELETE'])
+def delete_user(id):
+    user = User.query.get(id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # (Tambahan: Kita harus cek/menghapus order terkait user ini,
+    # tapi untuk sekarang kita hapus langsung)
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return jsonify({'message': 'User deleted'}), 200
 
 # 4. Jalankan Aplikasi
 if __name__ == '__main__':

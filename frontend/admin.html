@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard</h1>
+        <a href="index.html">Kembali ke Halaman User</a>
+    </header>
+
+    <div class="top-grid">
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Driver Service</h2>
+                </div>
+            <button id="refreshDriversBtn">Refresh Drivers</button>
+            <table id="driver-table">
+                <thead>
+                    <tr>
+                        <th>Driver ID</th>
+                        <th>Nama</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="driver-list-body"></tbody>
+            </table>
+        </section>
+
+        <section class="panel">
+             <div class="panel-header">
+                <h2>Order Service</h2>
+            </div>
+            <button id="refreshOrdersBtn">Refresh All Orders</button>
+            <table id="order-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>User ID</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Driver ID</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="order-list-body"></tbody>
+            </table>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Restaurant Service</h2>
+                </div>
+            <button id="refreshRestosBtn">Refresh Restaurants</button>
+            <table id="resto-table">
+                <thead>
+                    <tr>
+                        <th>Resto ID</th>
+                        <th>Nama</th>
+                        <th>Alamat</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="resto-list-body"></tbody>
+            </table>
+        </section>
+
+        <section class="panel">
+             <div class="panel-header">
+                <h2>User Service</h2>
+                </div>
+            <button id="refreshUsersBtn">Refresh Users</button>
+            <table id="user-table">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Alamat</th>
+                        </tr>
+                </thead>
+                <tbody id="user-list-body"></tbody>
+            </table>
+        </section>
+    </div>
+
+    <section id="menu-panel" class="panel full-width hidden">
+        <h2 id="menu-panel-title"></h2>
+        
+        <hr>
+        
+        <form id="menu-form">
+            <input type="hidden" id="menu-id-input">
+            <input type="hidden" id="menu-resto-id-input">
+            
+            <div class="form-inline">
+                <div class="form-group">
+                    <label for="menu-name">Nama Menu</label>
+                    <input type="text" id="menu-name" placeholder="Nasi Goreng" required>
+                </div>
+                <div class="form-group">
+                    <label for="menu-price">Harga (Rp)</label>
+                    <input type="number" id="menu-price" placeholder="15000" required>
+                </div>
+                <button type="submit" id="menu-submit-btn" class="submit-btn green">Tambah Menu</button>
+                <button type="button" id="menu-cancel-btn" class="submit-btn gray hidden">Batal Edit</button>
+            </div>
+        </form>
+        
+        <hr>
+
+        <h3>Daftar Menu Saat Ini</h3>
+        <div class="table-container">
+            <table id="menu-list-table">
+                <thead>
+                    <tr>
+                        <th>Menu ID</th>
+                        <th>Nama</th>
+                        <th>Harga</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="menu-list-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <script src="admin.js"></script>
+</body>
+</html>
