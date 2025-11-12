@@ -59,6 +59,35 @@ def register_user():
     
     return jsonify({'message': 'User created successfully', 'user': new_user.to_dict()}), 201
 
+# BARU: Endpoint untuk CREATE user (untuk Admin)
+@app.route('/users', methods=['POST'])
+def create_user_by_admin():
+    data = request.get_json()
+    
+    # Cek apakah data minimal ada
+    if not data or not 'email' in data or not 'name' in data:
+        return jsonify({'error': 'Missing required data: name and email'}), 400
+
+    # Cek apakah email sudah ada
+    if User.query.filter_by(email=data['email']).first():
+        return jsonify({'error': 'Email already exists'}), 400
+    
+    # Buat password default untuk user baru
+    # Anda bisa ganti 'password123' dengan yang lain
+    hashed_password = bcrypt.generate_password_hash('password').decode('utf-8')
+    
+    new_user = User(
+        name=data['name'],
+        email=data['email'],
+        password=hashed_password,
+        address=data.get('address')
+    )
+    
+    db.session.add(new_user)
+    db.session.commit()
+    
+    return jsonify({'message': 'User created by admin', 'user': new_user.to_dict()}), 201
+
 # BARU: Endpoint untuk mendapatkan SEMUA user (untuk dropdown)
 @app.route('/users', methods=['GET'])
 def get_all_users():

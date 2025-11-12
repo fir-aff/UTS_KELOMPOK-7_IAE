@@ -16,8 +16,11 @@
         <section class="panel">
             <div class="panel-header">
                 <h2>Driver Service</h2>
-                </div>
-            <button id="refreshDriversBtn">Refresh Drivers</button>
+            </div>
+            <div class="lok_btn">
+                <button id="refreshDriversBtn">Refresh Drivers</button>
+                <button class="add-new-btn" id="add-driver-btn">+ Tambah Driver</button>
+            </div>
             <table id="driver-table">
                 <thead>
                     <tr>
@@ -54,8 +57,11 @@
         <section class="panel">
             <div class="panel-header">
                 <h2>Restaurant Service</h2>
-                </div>
-            <button id="refreshRestosBtn">Refresh Restaurants</button>
+            </div>
+            <div class="lok_btn">
+                <button id="refreshRestosBtn">Refresh Restaurants</button>
+                <button class="add-new-btn" id="add-resto-btn">+ Tambah Resto</button>
+            </div>
             <table id="resto-table">
                 <thead>
                     <tr>
@@ -72,8 +78,11 @@
         <section class="panel">
              <div class="panel-header">
                 <h2>User Service</h2>
-                </div>
-            <button id="refreshUsersBtn">Refresh Users</button>
+            </div>
+            <div class="lok_btn">
+                <button id="refreshUsersBtn">Refresh Users</button>
+                <button class="add-new-btn" id="add-user-btn">+ Tambah User</button>
+            </div>
             <table id="user-table">
                 <thead>
                     <tr>
@@ -81,6 +90,7 @@
                         <th>Nama</th>
                         <th>Email</th>
                         <th>Alamat</th>
+                        <th>Aksi</th>
                         </tr>
                 </thead>
                 <tbody id="user-list-body"></tbody>
@@ -91,25 +101,13 @@
     <section id="menu-panel" class="panel full-width hidden">
         <h2 id="menu-panel-title"></h2>
         
+        <input type="hidden" id="menu-resto-id-input">
+        
         <hr>
         
-        <form id="menu-form">
-            <input type="hidden" id="menu-id-input">
-            <input type="hidden" id="menu-resto-id-input">
-            
-            <div class="form-inline">
-                <div class="form-group">
-                    <label for="menu-name">Nama Menu</label>
-                    <input type="text" id="menu-name" placeholder="Nasi Goreng" required>
-                </div>
-                <div class="form-group">
-                    <label for="menu-price">Harga (Rp)</label>
-                    <input type="number" id="menu-price" placeholder="15000" required>
-                </div>
-                <button type="submit" id="menu-submit-btn" class="submit-btn green">Tambah Menu</button>
-                <button type="button" id="menu-cancel-btn" class="submit-btn gray hidden">Batal Edit</button>
-            </div>
-        </form>
+        <button type="button" id="add-menu-btn" class="submit-btn green" style="align-self: flex-start; margin-bottom: 1rem;">
+            Tambah Menu Baru
+        </button>
         
         <hr>
 
@@ -128,6 +126,25 @@
             </table>
         </div>
     </section>
+
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close-btn" id="modal-close-btn">&times;</span>
+            
+            <h2 id="modal-title">Edit Item</h2>
+            
+            <form id="modal-form">
+                <div id="modal-form-body"></div>
+                
+                <input type="hidden" id="modal-item-id">
+                <input type="hidden" id="modal-service-type">
+                
+                <hr>
+                
+                <button type="submit" class="submit-btn green">Simpan Perubahan</button>
+            </form>
+        </div>
+    </div>
 
     <script src="admin.js"></script>
 </body>
