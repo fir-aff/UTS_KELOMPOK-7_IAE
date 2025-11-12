@@ -1,0 +1,144 @@
+/* frontend/style.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+header {
+    background-color: #333;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+header h1 {
+    margin: 0;
+}
+.profile-box {
+    background: #444;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9em;
+}
+.profile-box p {
+    margin: 5px 0;
+}
+#user-name, #user-address {
+    font-weight: bold;
+    color: #ffd700; /* Warna kuning untuk menyorot */
+}
+main {
+    display: flex;
+    justify-content: space-around;
+    padding: 1rem;
+    gap: 1rem;
+}
+section {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    width: 31%;
+    display: flex;
+    flex-direction: column;
+}
+h2 {
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h3 {
+    font-style: italic;
+    color: #555;
+}
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background 0.2s;
+}
+button:hover {
+    background-color: #0056b3;
+}
+button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+ul {
+    list-style: none;
+    padding: 0;
+    overflow-y: auto; /* Tambahkan scroll jika list panjang */
+}
+#restaurant-list li, #menu-list li {
+    background: #eee;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+#restaurant-list li:hover, #menu-list li:hover {
+    background: #ddd;
+}
+#cart-item {
+    border: 1px dashed #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+}
+hr {
+    margin: 2rem 0;
+}
+/* Style untuk tabel riwayat */
+#order-history-container {
+    flex-grow: 1; /* Agar tabel mengisi sisa ruang */
+    overflow-y: auto;
+}
+#order-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+#order-table th, #order-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+#order-table th {
+    background-color: #f2f2f2;
+}
+/* Sorot status untuk visual */
+.status-pending {
+    color: #e67e22;
+    font-weight: bold;
+}
+.status-confirmed {
+    color: #27ae60;
+    font-weight: bold;
+}
+/* BARU: Style untuk tombol "Selesai" di dalam tabel */
+.complete-btn {
+    background-color: #28a745; /* Warna hijau */
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.complete-btn:hover {
+    background-color: #218838;
+}
+
+/* Style untuk status DELIVERED */
+.status-delivered {
+    color: #6c757d; /* Warna abu-abu */
+    font-weight: bold;
+}

@@ -93,6 +93,61 @@ def find_driver_for_order():
         'driver_name': available_driver.name
     }), 200
 
+# BARU: Endpoint untuk mengubah status driver secara manual
+# Ini akan dipanggil oleh order-service
+@app.route('/drivers/<int:driver_id>/status', methods=['PUT'])
+def update_driver_status(driver_id):
+    driver = Driver.query.get(driver_id)
+    if not driver:
+        return jsonify({'error': 'Driver not found'}), 404
+
+    data = request.get_json()
+    new_status = data.get('status')
+
+    # Validasi input
+    if new_status not in ['available', 'on_trip']:
+        return jsonify({'error': 'Invalid status value. Must be "available" or "on_trip"'}), 400
+
+    driver.status = new_status
+    db.session.commit()
+
+    app.logger.info(f"Driver {driver.id} status updated to {new_status} by external request")
+    return jsonify({'message': 'Driver status updated', 'driver': driver.to_dict()}), 200
+# BARU: Endpoint untuk menyelesaikan pesanan (dipanggil oleh Frontend)
+@app.route('/orders/<int:order_id>/complete', methods=['PUT'])
+def complete_order(order_id):
+    order = Order.query.get(order_id)
+    if not order:
+        return jsonify({'error': 'Order not found'}), 404
+
+    # 1. Ubah status order di database ini
+    order.status = 'DELIVERED'
+    db.session.commit()
+    app.logger.info(f"Order {order.id} status updated to DELIVERED")
+
+    # 2. Periksa apakah ada driver yang ditugaskan
+    if order.driver_id:
+        driver_id = order.driver_id
+        app.logger.info(f"Order {order.id} was handled by driver {driver_id}. Releasing driver...")
+
+        # 3. Panggil driver-service untuk membebaskan driver (Peran Consumer)
+        try:
+            callback_url = f"{DRIVER_SERVICE_URL}/drivers/{driver_id}/status"
+            callback_payload = {"status": "available"}
+
+            response = requests.put(callback_url, json=callback_payload)
+            response.raise_for_status() # Error jika status code bukan 2xx
+
+            app.logger.info(f"Successfully called driver-service to release driver {driver_id}")
+
+        except requests.exceptions.RequestException as e:
+            # Jika ini gagal, pesanan tetap 'DELIVERED' tapi driver mungkin 'stuck'
+            # Di dunia nyata, ini akan masuk antrian 'retry'
+            app.logger.error(f"Failed to call driver-service to release driver {driver_id}: {e}")
+            # Kita tidak kirim error ke user, karena order-nya sudah selesai.
+            # Ini masalah internal antar service.
+
+    return jsonify({'message': 'Order completed and driver released'}), 200
 
 # 4. Jalankan Aplikasi
 if __name__ == '__main__':

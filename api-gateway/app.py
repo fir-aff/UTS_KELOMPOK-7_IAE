@@ -1,8 +1,12 @@
 # api-gateway/app.py
 from flask import Flask, request, Response
 import requests
+from flask_cors import CORS
 
 app = Flask(__name__)
+# Izinkan semua origin (domain) untuk mengakses /api/
+# Ini akan memperbaiki error CORS di browser
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Definisikan alamat dasar dari semua layanan Anda
 SERVICE_MAP = {
