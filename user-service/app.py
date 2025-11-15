@@ -12,7 +12,7 @@ bcrypt = Bcrypt(app)
 
 # BARU: Konfigurasi JWT
 # Ganti ini dengan kunci rahasia Anda sendiri di dunia nyata
-app.config["JWT_SECRET_KEY"] = "kunci-rahasia-EAI-anda-yang-aman" 
+app.config["JWT_SECRET_KEY"] = "kunci-rahasia-EAI-anda-yang-aman"
 jwt = JWTManager(app)
 
 # Konfigurasi Database (MySQL)

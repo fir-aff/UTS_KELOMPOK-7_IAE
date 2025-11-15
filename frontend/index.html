@@ -1,3 +1,4 @@
+<!-- frontend/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,6 +21,7 @@
 
     <main class="user-main">
 
+        <!-- KOLOM 1: LOGIN -->
         <section id="user-selection" class="panel">
             <h2>1. Login (dari User Service)</h2>
             <form id="login-form">
@@ -37,6 +39,7 @@
             <p id="login-status"></p>
         </section>
 
+        <!-- KOLOM 2: PILIH RESTORAN & MENU -->
         <section id="restaurant-selection" class="panel hidden">
             <h2>2. Pilih Restoran & Menu</h2>
             <label for="restaurant-dropdown">Pilih Restoran:</label>
@@ -50,6 +53,7 @@
             </div>
         </section>
 
+        <!-- KOLOM 3: KERANJANG & PESAN -->
         <section id="order-creation" class="panel hidden">
             <h2>3. Keranjang & Pesan</h2>
             <div id="cart">
@@ -66,11 +70,25 @@
 
     </main>
 
+    <!-- Bagian Riwayat Pesanan -->
     <section id="history-section" class="panel hidden">
         <h2>Riwayat Pesanan (Auto-Refresh 5 dtk)</h2>
         <div id="order-history-container">
             <table id="order-table">
-                </table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Driver ID</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <!-- INI ADALAH PERBAIKANNYA: id="order-list-body" -->
+                <tbody id="order-list-body">
+                    <!-- Data riwayat akan diisi oleh JavaScript -->
+                </tbody>
+            </table>
         </div>
     </section>
 

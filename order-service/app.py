@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 # BARU: Konfigurasi JWT
 # Kuncinya HARUS SAMA dengan user-service
-app.config["JWT_SECRET_KEY"] = "kunci-rahasia-EAI-anda-yang-aman" 
+app.config["JWT_SECRET_KEY"] = "kunci-rahasia-EAI-anda-yang-aman"
 jwt = JWTManager(app)
 
 # Konfigurasi Database (MySQL)
