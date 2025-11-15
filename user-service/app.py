@@ -11,8 +11,7 @@ app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
 # BARU: Konfigurasi JWT
-# Ganti ini dengan kunci rahasia Anda sendiri di dunia nyata
-app.config["JWT_SECRET_KEY"] = "kunci-rahasia-EAI-anda-yang-aman"
+app.config["JWT_SECRET_KEY"] = "RAHASIA" # HARUS SAMA DENGAN order-service
 jwt = JWTManager(app)
 
 # Konfigurasi Database (MySQL)
@@ -30,14 +29,7 @@ class User(db.Model):
     address = db.Column(db.String(200), nullable=True)
 
     def to_dict(self):
-        # Fungsi ini penting untuk mengubah data User menjadi JSON
-        # Jangan sertakan password dalam response
-        return {
-            'id': self.id,
-            'name': self.name,
-            'email': self.email,
-            'address': self.address
-        }
+        return { 'id': self.id, 'name': self.name, 'email': self.email, 'address': self.address }
 
 # 3. Buat Endpoint (Kontrak API)
 
@@ -47,9 +39,9 @@ def register_user():
     data = request.get_json()
     if User.query.filter_by(email=data['email']).first():
         return jsonify({'error': 'Email already exists'}), 400
-    
+
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-    
+
     new_user = User(
         name=data['name'],
         email=data['email'],
@@ -65,17 +57,15 @@ def register_user():
 def login_user():
     data = request.get_json()
     user = User.query.filter_by(email=data['email']).first()
-    
+
     if user and bcrypt.check_password_hash(user.password, data['password']):
         # BARU: Buat token jika login berhasil
-        # Token ini berisi 'identity' (identitas) user, yaitu ID-nya
-        # Frontend akan menyimpan token ini
         access_token = create_access_token(identity=user.id)
         return jsonify(access_token=access_token)
-    
+
     return jsonify({'error': 'Invalid credentials'}), 401
 
-# Endpoint untuk mendapatkan SEMUA user (untuk admin/user list)
+# Endpoint untuk mendapatkan SEMUA user
 @app.route('/users', methods=['GET'])
 def get_all_users():
     try:
@@ -84,7 +74,7 @@ def get_all_users():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Endpoint untuk mendapatkan data user (dipanggil oleh order-service)
+# Endpoint untuk mendapatkan data user
 @app.route('/users/<int:id>', methods=['GET'])
 def get_user_by_id(id):
     user = User.query.get(id)
@@ -92,46 +82,37 @@ def get_user_by_id(id):
         return jsonify({'error': 'User not found'}), 404
     return jsonify(user.to_dict()), 200
 
-# Endpoint untuk UPDATE user (untuk Admin)
+# Endpoint untuk UPDATE user
 @app.route('/users/<int:id>', methods=['PUT'])
 def update_user(id):
     user = User.query.get(id)
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-        
+    if not user: return jsonify({'error': 'User not found'}), 404
     data = request.get_json()
-    
     if 'email' in data and data['email'] != user.email:
         if User.query.filter_by(email=data['email']).first():
             return jsonify({'error': 'Email already exists'}), 400
-    
     user.name = data.get('name', user.name)
     user.email = data.get('email', user.email)
     user.address = data.get('address', user.address)
-    
     if 'password' in data and data['password']:
          user.password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-
     db.session.commit()
     return jsonify({'message': 'User updated', 'user': user.to_dict()}), 200
 
-# Endpoint untuk DELETE user (untuk Admin)
+# Endpoint untuk DELETE user
 @app.route('/users/<int:id>', methods=['DELETE'])
 def delete_user(id):
     user = User.query.get(id)
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-    
+    if not user: return jsonify({'error': 'User not found'}), 404
     db.session.delete(user)
     db.session.commit()
     return jsonify({'message': 'User deleted'}), 200
 
-# Endpoint untuk Seeding Data Awal
+# Endpoint untuk Seeding
 @app.route('/debug/seed', methods=['POST'])
 def seed_users():
     try:
         db.session.query(User).delete()
-        
         user1 = User(
             name='Ratna (User)',
             email='ratna@gmail.com',

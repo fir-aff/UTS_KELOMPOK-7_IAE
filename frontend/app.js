@@ -49,7 +49,8 @@ async function handleLogin(event) {
             body: JSON.stringify({
                 email: loginEmailInput.value,
                 password: loginPasswordInput.value
-            })
+            }),
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -148,7 +149,7 @@ async function fetchRestaurants() {
     if (!headers) return;
 
     try {
-        const response = await fetch(`${GATEWAY_URL}/restaurant-service/restaurants`, { headers });
+        const response = await fetch(`${GATEWAY_URL}/restaurant-service/restaurants`, { headers, credentials: 'include' });
         const restaurants = await response.json();
 
         restaurantDropdown.innerHTML = '<option value="">--Pilih Resto--</option>';
@@ -174,7 +175,7 @@ async function fetchMenu(restoId) {
     menuContainer.classList.remove("hidden");
 
     try {
-        const response = await fetch(`${GATEWAY_URL}/restaurant-service/restaurants/${restoId}/menu`, { headers });
+        const response = await fetch(`${GATEWAY_URL}/restaurant-service/restaurants/${restoId}/menu`, { headers, credentials: 'include' });
         const menuItems = await response.json();
 
         menuList.innerHTML = ""; 
@@ -261,6 +262,7 @@ async function createOrder() {
             method: 'POST',
             headers: headers, // Kirim token di header
             body: JSON.stringify({ "items": itemsPayload }), // Hanya kirim items
+            credentials: 'include'
         });
 
         const result = await response.json();
@@ -296,7 +298,7 @@ async function fetchOrders() {
 
     try {
         // Panggil endpoint baru (tanpa ID)
-        const response = await fetch(`${GATEWAY_URL}/order-service/orders/user`, { headers });
+        const response = await fetch(`${GATEWAY_URL}/order-service/orders/user`, { headers, credentials: 'include' });
         if (response.status === 401) { // Token expired
             handleLogout();
             loginStatus.textContent = "Sesi Anda habis. Silakan login lagi.";
@@ -352,7 +354,8 @@ async function completeOrder(orderId) {
     try {
         const response = await fetch(`${GATEWAY_URL}/order-service/orders/${orderId}/complete`, {
             method: 'PUT',
-            headers: headers // Kirim token
+            headers: headers, // Kirim token
+            credentials: 'include'
         });
         const result = await response.json();
         if (!response.ok) {
