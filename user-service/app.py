@@ -3,20 +3,19 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 import os
-# BARU: Impor library JWT
-from flask_jwt_extended import create_access_token, JWTManager
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 
 # 1. Inisialisasi Aplikasi
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
-# BARU: Konfigurasi JWT
-app.config["JWT_SECRET_KEY"] = "RAHASIA" # HARUS SAMA DENGAN order-service
-jwt = JWTManager(app)
-
-# Konfigurasi Database (MySQL)
+# Konfigurasi Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@127.0.0.1/user_service_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Konfigurasi JWT (KUNCI BARU)
+app.config["JWT_SECRET_KEY"] = "ini-pasti-berhasil-777" # PASTIKAN SAMA DENGAN order-service
+jwt = JWTManager(app)
 
 db = SQLAlchemy(app)
 
@@ -29,9 +28,14 @@ class User(db.Model):
     address = db.Column(db.String(200), nullable=True)
 
     def to_dict(self):
-        return { 'id': self.id, 'name': self.name, 'email': self.email, 'address': self.address }
+        return {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+            'address': self.address
+        }
 
-# 3. Buat Endpoint (Kontrak API)
+# 3. Buat Endpoint
 
 # Endpoint untuk registrasi user baru
 @app.route('/users/register', methods=['POST'])
@@ -39,9 +43,7 @@ def register_user():
     data = request.get_json()
     if User.query.filter_by(email=data['email']).first():
         return jsonify({'error': 'Email already exists'}), 400
-
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-
     new_user = User(
         name=data['name'],
         email=data['email'],
@@ -52,20 +54,23 @@ def register_user():
     db.session.commit()
     return jsonify({'message': 'User created successfully', 'user': new_user.to_dict()}), 201
 
-# Endpoint untuk login (DIUBAH UNTUK JWT)
+# Endpoint untuk login (Mengembalikan Token + Data User)
 @app.route('/auth/login', methods=['POST'])
 def login_user():
     data = request.get_json()
     user = User.query.filter_by(email=data['email']).first()
-
+    
     if user and bcrypt.check_password_hash(user.password, data['password']):
-        # BARU: Buat token jika login berhasil
         access_token = create_access_token(identity=user.id)
-        return jsonify(access_token=access_token)
-
+        return jsonify({
+            'message': 'Login successful', 
+            'access_token': access_token,
+            'user': user.to_dict() # Kirim data user saat login
+        }), 200
+    
     return jsonify({'error': 'Invalid credentials'}), 401
 
-# Endpoint untuk mendapatkan SEMUA user
+# Endpoint untuk mendapatkan SEMUA user (untuk Admin)
 @app.route('/users', methods=['GET'])
 def get_all_users():
     try:
@@ -74,7 +79,7 @@ def get_all_users():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Endpoint untuk mendapatkan data user
+# Endpoint untuk mendapatkan data user (dipanggil oleh order-service)
 @app.route('/users/<int:id>', methods=['GET'])
 def get_user_by_id(id):
     user = User.query.get(id)
@@ -82,11 +87,23 @@ def get_user_by_id(id):
         return jsonify({'error': 'User not found'}), 404
     return jsonify(user.to_dict()), 200
 
-# Endpoint untuk UPDATE user
+# Endpoint untuk mendapatkan profil user yang sedang login (dipanggil frontend)
+@app.route('/auth/profile', methods=['GET'])
+@jwt_required()
+def get_profile():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    return jsonify(user.to_dict()), 200
+
+# Endpoint untuk UPDATE user (untuk Admin)
 @app.route('/users/<int:id>', methods=['PUT'])
+# (Bisa ditambahkan @jwt_required() jika admin juga harus login)
 def update_user(id):
     user = User.query.get(id)
-    if not user: return jsonify({'error': 'User not found'}), 404
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
     data = request.get_json()
     if 'email' in data and data['email'] != user.email:
         if User.query.filter_by(email=data['email']).first():
@@ -99,11 +116,13 @@ def update_user(id):
     db.session.commit()
     return jsonify({'message': 'User updated', 'user': user.to_dict()}), 200
 
-# Endpoint untuk DELETE user
+# Endpoint untuk DELETE user (untuk Admin)
 @app.route('/users/<int:id>', methods=['DELETE'])
+# (Bisa ditambahkan @jwt_required() jika admin juga harus login)
 def delete_user(id):
     user = User.query.get(id)
-    if not user: return jsonify({'error': 'User not found'}), 404
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
     db.session.delete(user)
     db.session.commit()
     return jsonify({'message': 'User deleted'}), 200
