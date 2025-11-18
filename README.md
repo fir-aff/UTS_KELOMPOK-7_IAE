@@ -7,6 +7,17 @@
 
 This repository houses a microservices-based application environment, designed to demonstrate inter-service communication and collaboration. The project is built with Python and likely utilizes frameworks for API development and data management. It includes an API gateway and several core services such as user management, restaurant listings, order processing, and driver services.
 
+## Anggota Kelompok & Peran 👥
+
+Berikut adalah pembagian tugas dan tanggung jawab untuk setiap layanan dalam sistem ini:
+
+| Nama Anggota | NIM | Peran / Tanggung Jawab | Layanan (Service) |
+| :--- | :--- | :--- | :--- |
+| **MUHAMMAD DEVARA** | 102022300345 | **Project Manager & Architect** | `driver-service` & Arsitektur Umum |
+| **FIRMAN ZUHDI AFFANDI** | 102022300382 | **Backend Developer** | `order-service` (Logic Inti) |
+| **FARIS KHANSA FAYZI** | 102022300415 | **Backend & Gateway Lead** | `user-service` & `api-gateway` |
+| **ZHAFRAN AHMAD ZAIDAN** | 102022300437 | **Frontend & Backend Dev** | `restaurant-service` & Frontend Integration |
+
 ## Fitur Utama ✨
 
 *   *API Gateway 🚪*: Centralized entry point for all client requests, routing them to the appropriate microservices.
