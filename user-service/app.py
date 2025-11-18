@@ -162,6 +162,28 @@ def delete_user(id):
 
     return jsonify({'message': 'User deleted'}), 200
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    try:
+        db.session.execute(db.text('SELECT 1'))
+        return jsonify({'status': 'healthy', 'database': 'connected'}), 200
+    except Exception as e:
+        return jsonify({'status': 'unhealthy', 'database': 'disconnected', 'error': str(e)}), 503
+
+@app.route('/debug/seed', methods=['POST'])
+def seed_users():
+    try:
+        db.session.query(User).delete()
+        # Buat 2 user default
+        u1 = User(name='Ratna User', email='ratna@gmail.com', password=bcrypt.generate_password_hash('password123').decode('utf-8'), address='Jl. Mawar No 1')
+        u2 = User(name='Budi Admin', email='budi@gmail.com', password=bcrypt.generate_password_hash('admin123').decode('utf-8'), address='Jl. Melati No 2')
+        db.session.add_all([u1, u2])
+        db.session.commit()
+        return jsonify({'message': 'User database seeded!'}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
 # 4. Jalankan Aplikasi
 if __name__ == '__main__':
     # Buat tabel database jika belum ada

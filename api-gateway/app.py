@@ -1,5 +1,5 @@
 # api-gateway/app.py
-from flask import Flask, request, Response
+from flask import Flask, request, Response, jsonify
 import requests
 from flask_cors import CORS
 
@@ -71,6 +71,10 @@ def proxy_request(service_name, path):
             
     return response
 
+@app.route('/health', methods=['GET'])
+def gateway_health_check():
+    # Cukup periksa apakah gateway itu sendiri berjalan
+    return jsonify({'status': 'healthy', 'service': 'api-gateway'}), 200
 
 @app.route('/')
 def index():

@@ -131,6 +131,37 @@ def delete_menu_item(menu_id):
     
     return jsonify({'message': 'Menu item deleted'}), 200
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    try:
+        db.session.execute(db.text('SELECT 1'))
+        return jsonify({'status': 'healthy', 'database': 'connected'}), 200
+    except Exception as e:
+        return jsonify({'status': 'unhealthy', 'error': str(e)}), 503
+
+@app.route('/debug/seed', methods=['POST'])
+def seed_restaurants():
+    try:
+        db.session.query(Menu).delete()
+        db.session.query(Restaurant).delete()
+        
+        r1 = Restaurant(name='Restoran Padang', address='Jl. Merdeka No 5')
+        db.session.add(r1); db.session.commit()
+        
+        m1 = Menu(name='Rendang', price=20000, restaurant_id=r1.id)
+        m2 = Menu(name='Ayam Pop', price=18000, restaurant_id=r1.id)
+        
+        r2 = Restaurant(name='Warung Tegal', address='Jl. Sudirman No 10')
+        db.session.add(r2); db.session.commit()
+        
+        m3 = Menu(name='Nasi Oreg', price=10000, restaurant_id=r2.id)
+        
+        db.session.add_all([m1, m2, m3]); db.session.commit()
+        return jsonify({'message': 'Restaurant database seeded!'}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 # 4. Jalankan Aplikasi
 if __name__ == '__main__':
     with app.app_context():

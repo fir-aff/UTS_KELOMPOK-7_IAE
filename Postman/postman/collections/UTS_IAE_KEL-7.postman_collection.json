@@ -1,9 +1,8 @@
 {
   "info": {
-    "_postman_id": "c84e9b07-0425-4be0-ac85-8ae2c5a11e1f",
+    "_postman_id": "53070c46-7c02-40bf-b33a-b9e90c30c407",
     "name": "UTS_IAE_KEL-7",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "23801799"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
@@ -11,10 +10,8 @@
       "item": [
         {
           "name": "New Request",
-          "id": "631e814e-ab86-483b-9638-c76f8088a5c0",
           "request": {
             "method": "POST",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "\r\n{\r\n    \"name\": \"bambang\",\r\n    \"email\": \"bambang@gmail.com\",\r\n    \"password\": \"bambang123\",\r\n    \"address\": \"Jalan berdua sama kamu No. 99\"\r\n}",
@@ -39,15 +36,12 @@
                 "register"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "New Request",
-          "id": "fc1942a0-e53a-445b-a2aa-e276c53090f6",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "http://127.0.0.1:5001/users",
               "protocol": "http",
@@ -62,15 +56,12 @@
                 "users"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "{{GATEWAY_URL}}/api/user-service/users",
-          "id": "be39376e-dedf-4c0a-9339-a28870090903",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "{{GATEWAY_URL}}/api/user-service/users",
               "host": [
@@ -82,18 +73,12 @@
                 "users"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "{{GATEWAY_URL}}/api/user-service/users/1",
-          "id": "dfbb12fd-9f87-4f9a-a4bb-be30754e0dff",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
           "request": {
             "method": "GET",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\npm.test(\"Response body has a user with name\", function () {\r\n    var jsonData = pm.response.json();\r\n    pm.expect(jsonData).to.have.property('name');\r\n    pm.expect(jsonData.id).to.eql(1);\r\n});",
@@ -115,15 +100,12 @@
                 "1"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "New Request",
-          "id": "f6bfddab-67b4-4e89-83d7-60625b7b04c1",
           "request": {
             "method": "PUT",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "\r\n{\r\n    \"name\": \"susi\",\r\n    \"email\": \"susi@gmail.com\",\r\n    \"password\": \"susi123\",\r\n    \"address\": \"Jalan berdua sama kamu No. 99\"\r\n}",
@@ -145,15 +127,12 @@
                 "1"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "New Request",
-          "id": "fee0a591-0eea-48ae-9cd0-d7ae6644b338",
           "request": {
             "method": "DELETE",
-            "header": [],
             "url": {
               "raw": "{{GATEWAY_URL}}/api/user-service/users/7",
               "host": [
@@ -166,21 +145,17 @@
                 "7"
               ]
             }
-          },
-          "response": []
+          }
         }
-      ],
-      "id": "bc99d0db-9d89-41c1-803e-7ce836ef133f"
+      ]
     },
     {
       "name": "Restaurant_service",
       "item": [
         {
           "name": "restaurants",
-          "id": "67150e72-25ac-4a9d-8401-5d12f0c4667b",
           "request": {
             "method": "POST",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "{\r\n    \"name\": \"Restoran lalapan\",\r\n    \"address\": \"Jalan jalan No. 1\"\r\n}",
@@ -204,15 +179,12 @@
                 "restaurants"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "menu",
-          "id": "fbd26719-9e13-4989-83b8-9807d7a43904",
           "request": {
             "method": "POST",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "{\r\n    \"name\": \"Nasi Goreng\",\r\n    \"price\": 15000\r\n}",
@@ -238,15 +210,12 @@
                 "menu"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "menu",
-          "id": "2e2be5d0-acd4-4303-8585-cf4bfc08ad39",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "http://127.0.0.1:5002/menu/1",
               "protocol": "http",
@@ -262,15 +231,12 @@
                 "1"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "restaurant",
-          "id": "6bde175e-0f84-440e-a1d1-a0542028f5ef",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "http://127.0.0.1:5002/restaurants",
               "protocol": "http",
@@ -285,15 +251,12 @@
                 "restaurants"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "New Request",
-          "id": "1a52ffe1-5e1b-42b3-aa9d-6c52599511dd",
           "request": {
             "method": "PUT",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "{\r\n    \"name\": \"Restoran abb\",\r\n    \"address\": \"Jalan sederhana No. 1\"\r\n}",
@@ -318,15 +281,12 @@
                 "4"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "New Request",
-          "id": "59f8d941-4d90-40d8-ab6e-7ab85f4843dd",
           "request": {
             "method": "DELETE",
-            "header": [],
             "url": {
               "raw": "http://127.0.0.1:5002/restaurants/5",
               "protocol": "http",
@@ -342,21 +302,17 @@
                 "5"
               ]
             }
-          },
-          "response": []
+          }
         }
-      ],
-      "id": "e642b52f-31a7-4fe8-bcfc-7bd1491c0cad"
+      ]
     },
     {
       "name": "Order-service",
       "item": [
         {
           "name": "New Request",
-          "id": "74299653-8f21-466f-b6d9-5583a74fbb42",
           "request": {
             "method": "POST",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "{\r\n    \"user_id\": 1, \r\n    \"items\": [\r\n        {\"menu_id\": 1, \"quantity\": 1}\r\n    ]\r\n}",
@@ -380,15 +336,12 @@
                 "orders"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "New Request",
-          "id": "271ba17d-916f-4d1f-97c9-18a5a00b9174",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "http://127.0.0.1:5003/orders",
               "protocol": "http",
@@ -403,21 +356,17 @@
                 "orders"
               ]
             }
-          },
-          "response": []
+          }
         }
-      ],
-      "id": "d258d9ed-2057-4cb0-91ef-eb407776405b"
+      ]
     },
     {
       "name": "Driver-service",
       "item": [
         {
           "name": "New Request",
-          "id": "66f361be-ab68-49a6-a033-d6ec270f1583",
           "request": {
             "method": "POST",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "\r\n{\r\n    \"name\": \"yono\",\r\n    \"status\": \"available\"\r\n}",
@@ -441,15 +390,12 @@
                 "drivers"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "New Request",
-          "id": "d84189ed-8843-41e4-ae70-fd3d27681185",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "http://127.0.0.1:5004/drivers",
               "protocol": "http",
@@ -464,15 +410,12 @@
                 "drivers"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "New Request",
-          "id": "1cd9bdec-dbfe-4b12-9935-692df8b4f64d",
           "request": {
             "method": "PUT",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "\r\n{\r\n    \"name\": \"agus\"\r\n}",
@@ -497,15 +440,12 @@
                 "7"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "New Request",
-          "id": "a34d3911-7ac0-4e71-a8a1-db3b70c135a4",
           "request": {
             "method": "DELETE",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "",
@@ -530,21 +470,17 @@
                 "2"
               ]
             }
-          },
-          "response": []
+          }
         }
-      ],
-      "id": "f0982095-d0f7-4d77-a0ba-322422e333ae"
+      ]
     },
     {
       "name": "Api-gateway",
       "item": [
         {
           "name": "New Request",
-          "id": "9127d1fd-1c83-4e55-9579-d85689e6f68c",
           "request": {
             "method": "POST",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "{\r\n    \"user_id\": 1, \r\n    \"items\": [\r\n        {\"menu_id\": 1, \"quantity\": 1}\r\n    ]\r\n}",
@@ -570,15 +506,12 @@
                 "orders"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "New Request",
-          "id": "367260ee-e881-4834-9ac8-187de1a61f8d",
           "request": {
             "method": "POST",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "{\r\n    \"name\": \"Sragen\"\r\n}\r\n",
@@ -603,15 +536,12 @@
                 "driver_service"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "New Request",
-          "id": "08b11867-6fe8-4246-9795-0f723999c303",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "http://127.0.0.1:5000/api/user-service/users",
               "protocol": "http",
@@ -628,11 +558,32 @@
                 "users"
               ]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "New Request",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://127.0.0.1:5000/api/order-service/debug/seed",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "order-service",
+                "debug",
+                "seed"
+              ]
+            }
+          }
         }
-      ],
-      "id": "954a4696-0685-4b82-abf0-7ea98406bf66"
+      ]
     }
   ]
 }

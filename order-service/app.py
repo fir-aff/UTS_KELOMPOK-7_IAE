@@ -228,6 +228,47 @@ def complete_order(order_id):
 
     return jsonify({'message': 'Order completed and driver released'}), 200
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    try:
+        db.session.execute(db.text('SELECT 1'))
+        return jsonify({'status': 'healthy', 'database': 'connected'}), 200
+    except Exception as e:
+        return jsonify({'status': 'unhealthy', 'error': str(e)}), 503
+    
+@app.route('/debug/seed', methods=['POST'])
+def seed_orders():
+    try:
+        # Hapus data lama
+        db.session.query(OrderItem).delete()
+        db.session.query(Order).delete()
+        
+        # Kita asumsikan User ID 1 & Driver ID 1 sudah ada (dari seed service lain)
+        
+        # Order 1: Selesai (DELIVERED)
+        o1 = Order(user_id=1, total_price=30000, status='DELIVERED', driver_id=1)
+        db.session.add(o1)
+        db.session.commit() # Commit agar o1 dapat ID
+        
+        # Item untuk Order 1
+        i1 = OrderItem(order_id=o1.id, menu_id=1, quantity=2, price_per_item=15000)
+        db.session.add(i1)
+        
+        # Order 2: Sedang Berjalan (CONFIRMED)
+        o2 = Order(user_id=1, total_price=45000, status='CONFIRMED', driver_id=2)
+        db.session.add(o2)
+        db.session.commit()
+        
+        i2 = OrderItem(order_id=o2.id, menu_id=2, quantity=1, price_per_item=25000)
+        i3 = OrderItem(order_id=o2.id, menu_id=1, quantity=1, price_per_item=20000)
+        db.session.add_all([i2, i3])
+        
+        db.session.commit()
+        return jsonify({'message': 'Order database seeded with dummy data!'}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 # 4. Jalankan Aplikasi
 if __name__ == '__main__':
     with app.app_context():

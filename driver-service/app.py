@@ -143,6 +143,25 @@ def delete_driver(driver_id):
 
     return jsonify({'message': 'Driver deleted'}), 200
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    try:
+        db.session.execute(db.text('SELECT 1'))
+        return jsonify({'status': 'healthy', 'database': 'connected'}), 200
+    except Exception as e:
+        return jsonify({'status': 'unhealthy', 'error': str(e)}), 503
+
+@app.route('/debug/seed', methods=['POST'])
+def seed_drivers():
+    try:
+        db.session.query(Driver).delete()
+        db.session.add_all([Driver(name='Pak Budi'), Driver(name='Bu Siti'), Driver(name='Mas Anton')])
+        db.session.commit()
+        return jsonify({'message': 'Driver database seeded!'}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 # 4. Jalankan Aplikasi
 if __name__ == '__main__':
     with app.app_context():
