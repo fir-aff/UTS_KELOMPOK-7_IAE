@@ -191,6 +191,12 @@ POST	/users/register	Mendaftarkan pengguna baru
 POST	/auth/login	Login pengguna (Return User Object)
 GET	/users	Mendapatkan semua list user (Admin)
 
+| Method | Endpoint | Deskripsi | 
+| :--- | :--- | :--- | :--- |
+| **POST** | /users/register | **Mendaftarkan pengguna baru** | 
+| **POST** | /auth/login | **Login pengguna (Return User Object)** | 
+| **GET** | /users | **Mendapatkan semua list user (Admin)** | 
+
 ## Lisensi 📄
 
 Tidak ada lisensi yang ditentukan.
