@@ -35,8 +35,8 @@ Sistem ini menggunakan pola arsitektur Microservices dengan Database per Service
 ```mermaid
 graph TD
     subgraph Client Side
-        User[Frontend User<br/>(index.html)]
-        Admin[Frontend Admin<br/>(admin.html)]
+        User[Frontend User<br>(index.html)]
+        Admin[Frontend Admin<br>(admin.html)]
     end
 
     subgraph Gateway Layer
