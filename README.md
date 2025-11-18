@@ -35,26 +35,26 @@ Sistem ini menggunakan pola arsitektur Microservices dengan Database per Service
 ```mermaid
 graph TD
     subgraph Client Side
-        User[Frontend User<br>(index.html)]
-        Admin[Frontend Admin<br>(admin.html)]
+        User["Frontend User<br/>(index.html)"]
+        Admin["Frontend Admin<br/>(admin.html)"]
     end
 
     subgraph Gateway Layer
-        Gateway[API Gateway<br/>Port: 5000]
+        Gateway["API Gateway<br/>Port: 5000"]
     end
 
     subgraph Service Layer
-        US[User Service<br/>Port: 5001]
-        RS[Restaurant Service<br/>Port: 5002]
-        OS[Order Service<br/>Port: 5003]
-        DS[Driver Service<br/>Port: 5004]
+        US["User Service<br/>Port: 5001"]
+        RS["Restaurant Service<br/>Port: 5002"]
+        OS["Order Service<br/>Port: 5003"]
+        DS["Driver Service<br/>Port: 5004"]
     end
 
     subgraph Data Layer
-        DB1[(MySQL:<br/>user_service_db)]
-        DB2[(MySQL:<br/>restaurant_service_db)]
-        DB3[(MySQL:<br/>order_service_db)]
-        DB4[(MySQL:<br/>driver_service_db)]
+        DB1[("MySQL:<br/>user_service_db")]
+        DB2[("MySQL:<br/>restaurant_service_db")]
+        DB3[("MySQL:<br/>order_service_db")]
+        DB4[("MySQL:<br/>driver_service_db")]
     end
 
     %% Flow Request
@@ -186,17 +186,46 @@ Berikut adalah endpoint kunci. Dokumentasi lengkap tersedia di folder docs/api/ 
 
 👤 User Service
 
-Method	Endpoint	Deskripsi
-POST	/users/register	Mendaftarkan pengguna baru
-POST	/auth/login	Login pengguna (Return User Object)
-GET	/users	Mendapatkan semua list user (Admin)
-
 | Method | Endpoint | Deskripsi | 
-| :--- | :--- | :--- | :--- |
+| :--- | :--- | :--- |
 | **POST** | /users/register | **Mendaftarkan pengguna baru** | 
 | **POST** | /auth/login | **Login pengguna (Return User Object)** | 
-| **GET** | /users | **Mendapatkan semua list user (Admin)** | 
+| **GET** | /users | **Mendapatkan semua list user (Admin)** |
 
-## Lisensi 📄
+🍽️ Restaurant Service
 
-Tidak ada lisensi yang ditentukan.
+| Method | Endpoint | Deskripsi | 
+| :--- | :--- | :--- |
+| **POST** | /users/register | **Mendaftarkan pengguna baru** | 
+| **POST** | /auth/login | **Login pengguna (Return User Object)** | 
+| **GET** | /users | **Mendapatkan semua list user (Admin)** |
+
+📦 Order Service
+
+| Method | Endpoint | Deskripsi | 
+| :--- | :--- | :--- |
+| **POST** | /users/register | **Mendaftarkan pengguna baru** | 
+| **POST** | /auth/login | **Login pengguna (Return User Object)** | 
+| **GET** | /users | **Mendapatkan semua list user (Admin)** |
+
+🛵 Driver Service
+
+| Method | Endpoint | Deskripsi | 
+| :--- | :--- | :--- |
+| **POST** | /users/register | **Mendaftarkan pengguna baru** | 
+| **POST** | /auth/login | **Login pengguna (Return User Object)** | 
+| **GET** | /users | **Mendapatkan semua list user (Admin)** |
+
+## Konfigurasi Environment (ENV)
+
+Proyek ini menggunakan konfigurasi langsung pada app.py untuk kemudahan demonstrasi akademik.
+
+Database URI: mysql+pymysql://root:@127.0.0.1/[nama_db]
+
+Default user: root
+
+Default password: (kosong)
+
+Host: 127.0.0.1
+
+Jika password MySQL Anda berbeda, silakan ubah string koneksi di setiap file app.py pada masing-masing service.
