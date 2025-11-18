@@ -77,6 +77,7 @@ graph TD
     RS --- DB2
     OS --- DB3
     DS --- DB4
+```
 
 ## Tech Stack 🛠
 
