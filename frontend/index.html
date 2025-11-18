@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Delivery App</title>
+    <link rel="stylesheet" href="style.css"> </head>
+<body>
+
+    <header>
+        <h1>Food Delivery Dashboard</h1>
+        <div class="profile-box">
+            <strong>Profil Pengguna</strong>
+            <p>Nama: <span id="user-name">-Pilih User-</span></p>
+            <p>Alamat: <span id="user-address">-</span></p>
+        </div>
+        <a href="admin.html" class="admin-link">Pergi ke Halaman Admin</a>
+    </header>
+
+    <main class="user-main">
+
+        <section id="user-selection" class="panel">
+            <h2>1. Pilih Pengguna (dari User Service)</h2>
+            <p>Silakan pilih user untuk "Login":</p>
+            <ul id="user-list">
+                </ul>
+        </section>
+
+        <section id="restaurant-selection" class="panel hidden">
+            <h2>2. Pilih Restoran & Menu (dari Restaurant Service)</h2>
+            
+            <label for="restaurant-dropdown">Pilih Restoran:</label>
+            <select id="restaurant-dropdown">
+                <option value="">--Pilih Resto--</option>
+            </select>
+
+            <div id="menu-container" class="hidden">
+                <hr>
+                <h3>Menu yang Tersedia:</h3>
+                <ul id="menu-list">
+                    </ul>
+            </div>
+        </section>
+
+        <section id="order-creation" class="panel hidden">
+            <h2>3. Keranjang & Pesan (ke Order Service)</h2>
+            
+            <div id="cart">
+                <h4>Keranjang Anda:</h4>
+                <ul id="cart-list">
+                    </ul>
+                <div id="cart-total">
+                    <strong>Total: Rp<span id="cart-total-price">0</span></strong>
+                </div>
+            </div>
+            
+            <button id="createOrderBtn" disabled>Kirim Pesanan</button>
+        </section>
+
+    </main>
+
+    <section id="history-section" class="panel hidden">
+        <h2>Riwayat Pesanan (dari Order & Driver Service)</h2>
+        <p>Auto-refresh setiap 5 detik. Status akan berubah dari `PENDING` -> `CONFIRMED`.</p>
+        <div id="order-history-container">
+            <table id="order-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Driver ID</th>
+                    </tr>
+                </thead>
+                <tbody id="order-list-body">
+                    </tbody>
+            </table>
+        </div>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+</html>
