@@ -26,6 +26,58 @@ Berikut adalah pembagian tugas dan tanggung jawab untuk setiap layanan dalam sis
 *   *Inter-Service Communication 📡*: Demonstrates how different microservices interact with each other, likely through HTTP requests.
 *   *Scalability & Maintainability ⬆*: Microservices architecture facilitates independent scaling and maintenance of individual components.
 
+## Arsitektur Sistem 🏗️
+
+Sistem ini menggunakan pola arsitektur Microservices dengan Database per Service. Klien tidak mengakses layanan secara langsung, melainkan melalui **API Gateway**.
+
+**Alur Data:** `Client (Frontend)` → `API Gateway` → `Microservices` → `Database`
+
+```mermaid
+graph TD
+    subgraph Client Side
+        User[Frontend User<br/>(index.html)]
+        Admin[Frontend Admin<br/>(admin.html)]
+    end
+
+    subgraph Gateway Layer
+        Gateway[API Gateway<br/>Port: 5000]
+    end
+
+    subgraph Service Layer
+        US[User Service<br/>Port: 5001]
+        RS[Restaurant Service<br/>Port: 5002]
+        OS[Order Service<br/>Port: 5003]
+        DS[Driver Service<br/>Port: 5004]
+    end
+
+    subgraph Data Layer
+        DB1[(MySQL:<br/>user_service_db)]
+        DB2[(MySQL:<br/>restaurant_service_db)]
+        DB3[(MySQL:<br/>order_service_db)]
+        DB4[(MySQL:<br/>driver_service_db)]
+    end
+
+    %% Flow Request
+    User --> Gateway
+    Admin --> Gateway
+    
+    Gateway --> US
+    Gateway --> RS
+    Gateway --> OS
+    Gateway --> DS
+
+    %% Inter-service Communication
+    OS -.->|Validasi User| US
+    OS -.->|Validasi Menu| RS
+    OS -.->|Request Driver| DS
+    DS -.->|Update Status| OS
+
+    %% Database Connection
+    US --- DB1
+    RS --- DB2
+    OS --- DB3
+    DS --- DB4
+
 ## Tech Stack 🛠
 
 *   *Programming Language*: Python 🐍
@@ -33,22 +85,32 @@ Berikut adalah pembagian tugas dan tanggung jawab untuk setiap layanan dalam sis
 *   *Database*: SQLite (for User Service), potentially others for different services.
 *   *Frontend*: HTML, CSS, and JavaScript for any user interface components.
 *   *Other*: API Gateway (implementation details not specified but a key component).
+*   *Tools*: Postman (Testing), Git
 
 ## Instalasi & Menjalankan 🚀
 
-1.  Clone repositori:
+1. Persiapan Database (MySQL)
+
+    Pastikan MySQL Server (XAMPP/Laragon) sudah berjalan. Buat 4 database kosong berikut:
+
+    * user_service_db
+    * restaurant_service_db
+    * order_service_db
+    * driver_service_db
+
+2.  Clone repositori:
 
     bash
     git clone https://github.com/fir-aff/UTS_KELOMPOK-7_IAE
     
 
-2.  Masuk ke direktori:
+3.  Masuk ke direktori:
 
     bash
     cd UTS_KELOMPOK-7_IAE
     
 
-3.  Install dependensi (untuk setiap service):
+4.  Install dependensi (untuk setiap service):
 
     bash
     cd api-gateway
@@ -72,7 +134,7 @@ Berikut adalah pembagian tugas dan tanggung jawab untuk setiap layanan dalam sis
     cd ..
     
 
-4.  Jalankan proyek (untuk setiap service - perlu menjalankan beberapa terminal):
+5.  Jalankan proyek (untuk setiap service - perlu menjalankan beberapa terminal):
 
     bash
     cd api-gateway
@@ -99,6 +161,13 @@ Berikut adalah pembagian tugas dan tanggung jawab untuk setiap layanan dalam sis
     .\venv\Scripts\activate
     python app.py
     cd ..
+
+6. Menjalankan Frontend
+    Buka folder frontend.
+
+    Klik kanan pada file index.html -> Open with Live Server (atau buka langsung di browser).
+
+    Untuk panel admin, buka file admin.html.
     
 
 ## Cara Berkontribusi 🤝
@@ -108,6 +177,19 @@ Berikut adalah pembagian tugas dan tanggung jawab untuk setiap layanan dalam sis
 3.  Lakukan commit perubahan Anda: git commit -am 'Tambahkan fitur baru'
 4.  Push ke branch: git push origin fitur-baru
 5.  Buat Pull Request.
+
+## Ringkasan Endpoint API 🔗
+
+Semua request dari frontend harus melalui API Gateway: http://127.0.0.1:5000/api/{service-name}/{endpoint}.
+
+Berikut adalah endpoint kunci. Dokumentasi lengkap tersedia di folder docs/api/ atau via Postman Collection.
+
+👤 User Service
+
+Method	Endpoint	Deskripsi
+POST	/users/register	Mendaftarkan pengguna baru
+POST	/auth/login	Login pengguna (Return User Object)
+GET	/users	Mendapatkan semua list user (Admin)
 
 ## Lisensi 📄
 
